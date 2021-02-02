@@ -1,67 +1,58 @@
-import { Component } from "react";
 import { ToastContainer } from "react-toastify";
 import Searchbar from "./components/Searchbar/Searchbar";
 import s from "./App.module.css";
 import Modal from "./components/common/Modal/Modal";
 import ContentContainer from "./components/ContentContainer/ContentContainer";
+import { useState } from "react";
 
-class App extends Component {
-  state = {
-    imageQuery: "",
-    page: 1,
-    showModal: false,
-    imgDescription: "",
-    modalImg: "",
+const App = () => {
+  const [imageQuery, setImageQuery] = useState("");
+  const [page, setPage] = useState(1);
+  const [showModal, setShowModal] = useState(false);
+  const [imgDescription, setImgDescription] = useState("");
+  const [modalImg, setModalImg] = useState("");
+
+  const onSubmit = (imageQuery) => {
+    setImageQuery(imageQuery);
+    setPage(1);
   };
 
-  onSubmit = (imageQuery) => this.setState({ imageQuery, page: 1 });
-
-  onLoadMoreClick = () => {
-    this.setState(({ page }) => ({ page: page + 1 }));
+  const onLoadMoreClick = () => {
+    setPage((page) => page + 1);
   };
 
-  closeModal = () => {
-    this.setState({ showModal: false, imgDescription: "", modalImg: "" });
+  const openModal = ({ target: { alt, dataset } }) => {
+    setShowModal(true);
+    setImgDescription(alt);
+    setModalImg(dataset.url);
   };
 
-  openModal = ({ target: { alt, dataset } }) => {
-    this.setState({
-      showModal: true,
-      imgDescription: alt,
-      modalImg: dataset.url,
-    });
+  const closeModal = () => {
+    setShowModal(false);
+    setImgDescription("");
+    setModalImg("");
   };
 
-  render() {
-    const {
-      imageQuery,
-      page,
-      showModal,
-      imgDescription,
-      modalImg,
-    } = this.state;
+  return (
+    <div className={s.app}>
+      <Searchbar onSubmit={onSubmit} />
 
-    return (
-      <div className={s.app}>
-        <Searchbar onSubmit={this.onSubmit} />
+      <ContentContainer
+        query={imageQuery}
+        page={page}
+        onBtnClick={onLoadMoreClick}
+        onImageClick={openModal}
+      />
 
-        <ContentContainer
-          query={imageQuery}
-          page={page}
-          onBtnClick={this.onLoadMoreClick}
-          onImageClick={this.openModal}
-        />
+      <ToastContainer autoClose={3000} />
 
-        <ToastContainer autoClose={3000} />
-
-        {showModal && (
-          <Modal onClose={this.closeModal}>
-            <img src={modalImg} alt={imgDescription} />
-          </Modal>
-        )}
-      </div>
-    );
-  }
-}
+      {showModal && (
+        <Modal onClose={closeModal}>
+          <img src={modalImg} alt={imgDescription} />
+        </Modal>
+      )}
+    </div>
+  );
+};
 
 export default App;
