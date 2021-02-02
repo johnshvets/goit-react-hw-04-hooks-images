@@ -1,3 +1,9 @@
+#eslint
+.eslintcache
+
+# production
+/build
+
 # Logs
 logs
 *.log
